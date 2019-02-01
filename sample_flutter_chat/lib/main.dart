@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
 
 const String _name = "Alexander Popov";
+
+final ThemeData kIOSTheme = ThemeData(
+  primarySwatch: Colors.red,
+  primaryColor: Colors.grey[100],
+  primaryColorBrightness: Brightness.light,
+);
+
+final ThemeData kDefaultTheme = ThemeData(
+  primarySwatch: Colors.red,
+  accentColor: Colors.redAccent,
+);
 
 void main() => runApp(SimpleChat());
 
@@ -9,6 +22,7 @@ class SimpleChat extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Simple Chat!',
+      theme: defaultTargetPlatform == TargetPlatform.iOS ? kIOSTheme : kDefaultTheme,
       home: ChatScreen(),
     );
   }
@@ -27,7 +41,10 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Simple Chat!')),
+      appBar: AppBar(
+          title: Text('Simple Chat!'),
+        elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 5.0,
+      ),
       body: Column(
         children: <Widget>[
           Flexible(
@@ -71,7 +88,11 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             ),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 5.0),
-              child: IconButton(
+              child: Theme.of(context).platform == TargetPlatform.iOS ?
+              CupertinoButton(
+                child: Text("Send"),
+                onPressed: _isComposing ? () => _handleSubmitted(_textController.text) : null) :
+              IconButton(
                   icon: Icon(Icons.send),
                   onPressed: _isComposing ? () => _handleSubmitted(_textController.text) : null),
             )
