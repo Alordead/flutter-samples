@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 
-const String _name = "Alexander Popov";
-
 final ThemeData kIOSTheme = ThemeData(
   primarySwatch: Colors.red,
   primaryColor: Colors.grey[100],
@@ -23,8 +21,80 @@ class SimpleChat extends StatelessWidget {
     return MaterialApp(
       title: 'Simple Chat!',
       theme: defaultTargetPlatform == TargetPlatform.iOS ? kIOSTheme : kDefaultTheme,
-      home: ChatScreen(),
+      home: LoginScreen(),
     );
+  }
+}
+
+class Person {
+  Person({this.name});
+  String name;
+
+  String getName() {
+    return name;
+  }
+  void setName(String text) {
+    name = text;
+  }
+}
+
+Person person = Person(name: "Anonimous");
+
+class LoginScreen extends StatefulWidget {
+  @override
+  State createState() => LoginScreenState();
+}
+
+class LoginScreenState extends State<LoginScreen> {
+  final _textController = TextEditingController();
+  bool _isComposing = false;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text("Let me know your name: "),
+              Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Row(
+                  children: <Widget>[
+                    Flexible(
+                      child: TextField(
+                        controller: _textController,
+                        onSubmitted: _handleSubmitted,
+                        decoration: InputDecoration.collapsed(
+                            hintText: "Ivan Ivanov"),
+                      ),
+                    ),
+                    RaisedButton(
+                      color: Theme
+                          .of(context)
+                          .primaryColor,
+                      colorBrightness: Theme
+                          .of(context)
+                          .primaryColorBrightness,
+                      onPressed: () {
+                        _handleSubmitted(_textController.text);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ChatScreen()),
+                        );
+                      },
+                      child: Text("Send"),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        )
+    );
+  }
+  void _handleSubmitted(String text) {
+    person.setName(text);
   }
 }
 
@@ -168,13 +238,13 @@ class ChatMessage extends StatelessWidget {
             children: <Widget>[
               Container(
                 margin: const EdgeInsets.only(right: 12.0),
-                child: CircleAvatar(child: Text(_name[0])),
+                child: CircleAvatar(child: Text(person.getName()[0])),
               ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(_name, style: Theme.of(context).textTheme.subhead),
+                    Text(person.getName(), style: Theme.of(context).textTheme.subhead),
                     Container(
                       margin: const EdgeInsets.only(top: 5.0),
                       child: Text(text),
