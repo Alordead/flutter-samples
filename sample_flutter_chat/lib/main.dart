@@ -33,8 +33,9 @@ class ChatScreen extends StatefulWidget {
   State createState() => ChatScreenState();
 }
 
+final List<ChatMessage> messages = <ChatMessage>[];
+
 class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
-  final List<ChatMessage> _messages = <ChatMessage>[];
   final TextEditingController _textController = TextEditingController();
   bool _isComposing = false;
 
@@ -42,7 +43,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text('Simple Chat!'),
+          title: Text('Simple Chat'),
         elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 5.0,
       ),
       body: Column(
@@ -51,8 +52,8 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             child: ListView.builder(
               padding: EdgeInsets.all(8.0),
               reverse: true,
-              itemBuilder: (_, int index) => _messages[index],
-              itemCount: _messages.length,
+              itemBuilder: (_, int index) => messages[index],
+              itemCount: messages.length,
             ),
           ),
           Divider(height: 1.0),
@@ -116,7 +117,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         ),
       );
       setState(() {
-        _messages.insert(0, message);
+        messages.insert(0, message);
       });
       message.animationController.forward();
     }
@@ -124,7 +125,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    for (ChatMessage message in _messages)
+    for (ChatMessage message in messages)
       message.animationController.dispose();
     super.dispose();
   }
@@ -137,33 +138,54 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizeTransition(
-      sizeFactor: CurvedAnimation(parent: animationController, curve: Curves.easeInOut),
-      axisAlignment: 0.0,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 10.0),
+    return Dismissible(
+      direction: DismissDirection.endToStart,
+      key: Key(text),
+      background: Container(
+        color: Theme.of(context).primaryColorDark,
+        padding: const EdgeInsets.all(10.0),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              margin: const EdgeInsets.only(right: 12.0),
-              child: CircleAvatar(child: Text(_name[0])),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(_name, style: Theme.of(context).textTheme.subhead),
-                  Container(
-                    margin: const EdgeInsets.only(top: 5.0),
-                    child: Text(text),
-                  ),
-                ],
-              ),
-            ),
+          crossAxisAlignment: CrossAxisAlignment.center,
+          textDirection: TextDirection.rtl,
+          children: <Widget>[Text(
+              "Delete",
+              style: TextStyle(color: Colors.white),
+              textScaleFactor: 1.5
+          )
           ],
         ),
-      )
+      ),
+      onDismissed: (direction) {
+        messages.remove(this);
+      },
+      child: SizeTransition(
+        sizeFactor: CurvedAnimation(parent: animationController, curve: Curves.easeIn),
+        axisAlignment: 0.0,
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 10.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.only(right: 12.0),
+                child: CircleAvatar(child: Text(_name[0])),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(_name, style: Theme.of(context).textTheme.subhead),
+                    Container(
+                      margin: const EdgeInsets.only(top: 5.0),
+                      child: Text(text),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        )
+      ),
     );
   }
 }
