@@ -27,18 +27,21 @@ class SimpleChat extends StatelessWidget {
 }
 
 class Person {
-  Person({this.name});
-  String name;
+  Person(String name) {
+    _name = name;
+  }
+
+  String _name;
 
   String getName() {
-    return name;
+    return _name;
   }
   void setName(String text) {
-    name = text;
+    _name = text;
   }
 }
 
-Person person = Person(name: "Anonimous");
+Person person = Person("Anonimous");
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -94,7 +97,9 @@ class LoginScreenState extends State<LoginScreen> {
     );
   }
   void _handleSubmitted(String text) {
-    person.setName(text);
+    if (text.length > 0) {
+      person.setName(text);
+    }
   }
 }
 
