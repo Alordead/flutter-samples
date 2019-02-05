@@ -1,119 +1,157 @@
 import 'package:flutter/material.dart';
 
-final appTitle = "Simple To-do list";
+final appTitle = "Simple To-Do list";
 
 final kDefaultTheme = ThemeData(
-  primarySwatch: Colors.lightGreen,
-  accentColor: Colors.lightGreenAccent,
+  primarySwatch: Colors.blue,
+  accentColor: Colors.blueAccent,
+  scaffoldBackgroundColor: Colors.grey[100],
+  primaryTextTheme: TextTheme(
+      title: TextStyle(
+        color: Colors.black,
+        fontFamily: 'Gotham',
+        fontSize: 26.0,
+      ),
+  ),
 );
 
 void main() {
-  return runApp( ToDoApp());
+  return runApp(ToDoApp());
 }
 
 class ToDoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: appTitle,
       theme: kDefaultTheme,
-      home: ToDoListScreen(
-        todos: List.generate(
-        1,
-            (i) => Todo(
-          'Example todo',
-          'Hello world!',
-        ),
-      ),),
+      home: ToDoListScreen(),
     );
   }
 }
 
 class ToDoListScreen extends StatefulWidget {
-  final List<Todo> todos;
 
-  ToDoListScreen({Key key, @required this.todos}) : super(key: key);
+  ToDoListScreen({Key key}) : super(key: key);
 
   @override
-  State createState() => ToDoListScreenState(todos: todos);
+  State createState() => ToDoListScreenState();
 }
 
-class ToDoListScreenState extends State<ToDoListScreen> {
-  final List<Todo> todos;
+List<Todo> todos = <Todo>[];
 
-  ToDoListScreenState({this.todos});
+class ToDoListScreenState extends State<ToDoListScreen> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(appTitle)),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(appTitle),
+        backgroundColor: Colors.grey[100],
+        elevation: 0.0,
+      ),
       body: Center(
-        child: Padding(
-          padding: EdgeInsets.all(20.0),
-          child: ListView.builder(
-            itemCount: 1,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(todos[index].title),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DetailToDoScreenRoute(todo: todos[index]),
-                    ),
-                  );
-                },
-              );
-            },
+        child: Container(
+          child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: ListView.builder(
+              itemCount: todos.length,
+              itemBuilder: (context, index) => todos[index],
+            ),
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Add',
-        child: Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CreateToDoScreenRoute())
-          );
-        },
+      floatingActionButton: Container(
+        height: 70.0,
+        width: 70.0,
+        child: FloatingActionButton(
+          tooltip: 'Add',
+          child: Icon(Icons.add, size: 35.0,),
+          onPressed: () {
+            setState(() {
+              todos.add(Todo(title: "", isEditing: true,));
+            });
+          },
+        ),
       ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
 
-class Todo {
+const _rowHeight = 60.0;
+final _borderRadius = BorderRadius.circular(_rowHeight / 2);
+
+class Todo extends StatefulWidget {
   final String title;
-  final String description;
+  final bool isEditing;
 
-  Todo(this.title, this.description);
-}
+  const Todo(
+      {Key key, @required this.title, @required this.isEditing})
+      :
+        assert(title != null),
+        assert(isEditing != null),
+        super(key: key);
 
-class CreateToDoScreenRoute extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Create note'),
-      ),
-      body: Column(
-
-      ),
-    );
+  State<StatefulWidget> createState() {
+    return TodoState(todo: this);
   }
 }
 
-class DetailToDoScreenRoute extends StatelessWidget {
+class TodoState extends State<Todo> {
   final Todo todo;
-
-  DetailToDoScreenRoute({Key key, @required this.todo}) : super(key : key);
-
+  bool isEditing = true;
+  TextEditingController _textEditingController = TextEditingController();
+  TodoState({this.todo});
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(todo.title),
-      ),
-    );
+    return Dismissible(
+      direction: DismissDirection.endToStart,
+      key: Key(todo.title),
+      onDismissed: (direction) {
+          todos.remove(Todo(title: todo.title,isEditing: false,));
+      },
+      child: Material(
+        color: Colors.transparent,
+        child: Padding(
+          padding: EdgeInsets.all(6.0),
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(40.0),
+            ),
+            color: Colors.white,
+            elevation: 6.0,
+            child: InkWell(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              borderRadius: _borderRadius,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                child: TextField(
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20.0,
+                  ),
+                  enabled: isEditing ? true : false,
+                  controller: _textEditingController,
+                  onSubmitted: _handleSubmitted,
+                  decoration: InputDecoration.collapsed(
+                      hintText: "Write your task here..."
+                  ),
+                ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+  }
+  void _handleSubmitted(String text) {
+    setState(() {
+      isEditing = false;
+    });
   }
 }
