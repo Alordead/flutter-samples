@@ -41,7 +41,7 @@ class ToDoListScreen extends StatefulWidget {
 
 List<Todo> todos = <Todo>[];
 
-class ToDoListScreenState extends State<ToDoListScreen> {
+class ToDoListScreenState extends State<ToDoListScreen>{
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +49,12 @@ class ToDoListScreenState extends State<ToDoListScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(appTitle),
-        backgroundColor: Colors.grey[100],
+        backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),
       body: Center(
         child: Container(
+          padding: EdgeInsets.only(bottom: 75.0),
           child: Padding(
             padding: EdgeInsets.all(20.0),
             child: ListView.builder(
@@ -64,14 +65,18 @@ class ToDoListScreenState extends State<ToDoListScreen> {
         ),
       ),
       floatingActionButton: Container(
-        height: 70.0,
-        width: 70.0,
+        height: MediaQuery.of(context).viewInsets.bottom == 0 ? 70.0 : 0.0,
+        width: MediaQuery.of(context).viewInsets.bottom == 0 ? 70.0 : 0.0,
         child: FloatingActionButton(
           tooltip: 'Add',
           child: Icon(Icons.add, size: 35.0,),
           onPressed: () {
             setState(() {
-              todos.add(Todo(title: "", isEditing: true,));
+              Todo todo = Todo(
+                title: "",
+                isEditing: true,
+              );
+              todos.add(todo);
             });
           },
         ),
@@ -101,11 +106,29 @@ class Todo extends StatefulWidget {
   }
 }
 
-class TodoState extends State<Todo> {
+class TodoState extends State<Todo> with TickerProviderStateMixin {
   final Todo todo;
+
+  AnimationController controller;
+  Animation<double> animation;
+
   bool isEditing = true;
   TextEditingController _textEditingController = TextEditingController();
+
   TodoState({this.todo});
+
+  initState() {
+    super.initState();
+
+    controller = AnimationController(
+        duration: const Duration(milliseconds: 500),
+        vsync: this
+    );
+    animation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
+
+    controller.forward();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dismissible(
@@ -118,40 +141,43 @@ class TodoState extends State<Todo> {
         color: Colors.transparent,
         child: Padding(
           padding: EdgeInsets.all(6.0),
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(40.0),
-            ),
-            color: Colors.white,
-            elevation: 6.0,
-            child: InkWell(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              borderRadius: _borderRadius,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-                child: TextField(
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20.0,
+          child: FadeTransition(
+            opacity: animation,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(40.0),
+              ),
+              color: Colors.white,
+              elevation: 6.0,
+              child: InkWell(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                borderRadius: _borderRadius,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                  child: TextField(
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20.0,
+                    ),
+                    enabled: isEditing ? true : false,
+                    controller: _textEditingController,
+                    onSubmitted: _handleSubmitted,
+                    decoration: InputDecoration.collapsed(
+                        hintText: "Write your task here..."
+                    ),
                   ),
-                  enabled: isEditing ? true : false,
-                  controller: _textEditingController,
-                  onSubmitted: _handleSubmitted,
-                  decoration: InputDecoration.collapsed(
-                      hintText: "Write your task here..."
                   ),
-                ),
                 ),
               ),
-            ),
+          ),
           ),
         ),
       );
   }
   void _handleSubmitted(String text) {
     setState(() {
-      isEditing = false;
+      isEditing = text.length == 0 ? true : false;
     });
   }
 }
