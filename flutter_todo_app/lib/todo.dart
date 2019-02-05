@@ -34,9 +34,7 @@ class TodoState extends State<Todo> with TickerProviderStateMixin {
     super.initState();
 
     controller = AnimationController(
-        duration: const Duration(milliseconds: 500),
-        vsync: this
-    );
+        duration: const Duration(milliseconds: 500), vsync: this);
     animation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
 
     controller.forward();
@@ -57,57 +55,71 @@ class TodoState extends State<Todo> with TickerProviderStateMixin {
           padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 3.0),
           child: FadeTransition(
             opacity: animation,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(80.0),
-              ),
-              color: Colors.white,
-              elevation: 6.0,
-              child: InkWell(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                borderRadius: _borderRadius,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                  child: Row(
-                    children: <Widget>[
-                      Flexible(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10.0),
-                          child: TextField(
-                            style: TextStyle(
-                              color: readyButtonPressed ? Colors.grey[500] : Colors.black,
-                              decoration: readyButtonPressed ? TextDecoration.lineThrough : null,
-                              fontSize: 20.0,
-                            ),
-                            enabled: editing ? true : false,
-                            controller: _textEditingController,
-                            maxLengthEnforced: false,
-                            onSubmitted: _handleSubmitted,
-                            decoration: InputDecoration.collapsed(
-                                hintText: "Write your task here..."
-                            ),
-                          ),
-                        ),
-                      ),
-                      Card(
-                        color: readyButtonPressed ? Colors.green[400] : Colors.grey,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50.0),
-                        ),
-                        child: IconButton(
-                          iconSize: 25.0,
-                          icon: Icon(Icons.done, color: Colors.white),
-                          onPressed: this.editing == true ? null : _readyButtonPressed,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            child: todoCard(),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget todoCard() {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(80.0),
+      ),
+      color: Colors.white,
+      elevation: 6.0,
+      child: InkWell(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        borderRadius: _borderRadius,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+          child: Row(
+            children: <Widget>[
+              todoCardTextField(),
+              todoCardReadyButton(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget todoCardTextField() {
+    return Flexible(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10.0),
+        child: TextField(
+          style: TextStyle(
+            color:
+            readyButtonPressed ? Colors.grey[500] : Colors.black,
+            decoration: readyButtonPressed
+                ? TextDecoration.lineThrough
+                : null,
+            fontSize: 20.0,
+          ),
+          enabled: editing ? true : false,
+          controller: _textEditingController,
+          maxLengthEnforced: false,
+          onSubmitted: _handleSubmitted,
+          decoration: InputDecoration.collapsed(
+              hintText: "Write your task here..."),
+        ),
+      ),
+    );
+  }
+
+  Widget todoCardReadyButton() {
+    return Card(
+      color: readyButtonPressed ? Colors.green[400] : Colors.grey,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(50.0),
+      ),
+      child: IconButton(
+        iconSize: 25.0,
+        icon: Icon(Icons.done, color: Colors.white),
+        onPressed: this.editing == true ? null : _readyButtonPressed,
       ),
     );
   }

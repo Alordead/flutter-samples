@@ -36,22 +36,31 @@ class ToDoListScreenState extends State<ToDoListScreen>{
           ),
         ),
       ),
-      floatingActionButton: Container(
-        height: MediaQuery.of(context).viewInsets.bottom == 0 ? 70.0 : 0.0,
-        width: MediaQuery.of(context).viewInsets.bottom == 0 ? 70.0 : 0.0,
-        child: FloatingActionButton(
-          tooltip: 'Add',
-          child: Icon(Icons.add, size: 35.0,),
-          onPressed: () {
-            setState(() {
-              Todo todo = Todo(index: count);
-              todos.add(todo);
-              count += 1;
-            });
-          },
-        ),
-      ),
+      floatingActionButton: todoFloatingActionButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
+
+  double floatingButtonNeedsBottomInsets() {
+    return MediaQuery.of(context).viewInsets.bottom == 0 ? 70.0 : 0.0;
+  }
+
+  Widget todoFloatingActionButton() {
+    return Container(
+      height: floatingButtonNeedsBottomInsets(),
+      width: floatingButtonNeedsBottomInsets(),
+      child: FloatingActionButton(
+        tooltip: 'Add',
+        child: Icon(Icons.add, size: 35.0,),
+        onPressed: () {
+          setState(() {
+            Todo todo = Todo(index: count);
+            todos.add(todo);
+            count += 1;
+          });
+        },
+      ),
+    );
+  }
+
 }
