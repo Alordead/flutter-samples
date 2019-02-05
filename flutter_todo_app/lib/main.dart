@@ -72,10 +72,7 @@ class ToDoListScreenState extends State<ToDoListScreen>{
           child: Icon(Icons.add, size: 35.0,),
           onPressed: () {
             setState(() {
-              Todo todo = Todo(
-                title: "",
-                isEditing: true,
-              );
+              Todo todo = Todo();
               todos.add(todo);
             });
           },
@@ -86,19 +83,14 @@ class ToDoListScreenState extends State<ToDoListScreen>{
   }
 }
 
-const _rowHeight = 60.0;
+final _rowHeight = 60.0;
 final _borderRadius = BorderRadius.circular(_rowHeight / 2);
 
 class Todo extends StatefulWidget {
-  final String title;
-  final bool isEditing;
+  String title;
+  bool editing;
 
-  const Todo(
-      {Key key, @required this.title, @required this.isEditing})
-      :
-        assert(title != null),
-        assert(isEditing != null),
-        super(key: key);
+  Todo({this.title, this.editing});
 
   @override
   State<StatefulWidget> createState() {
@@ -107,12 +99,14 @@ class Todo extends StatefulWidget {
 }
 
 class TodoState extends State<Todo> with TickerProviderStateMixin {
-  final Todo todo;
+  Todo todo;
 
   AnimationController controller;
   Animation<double> animation;
 
-  bool isEditing = true;
+  bool editing = true;
+  bool readyButtonPressed = false;
+  
   TextEditingController _textEditingController = TextEditingController();
 
   TodoState({this.todo});
@@ -135,17 +129,17 @@ class TodoState extends State<Todo> with TickerProviderStateMixin {
       direction: DismissDirection.endToStart,
       key: Key(todo.title),
       onDismissed: (direction) {
-          todos.remove(Todo(title: todo.title,isEditing: false,));
+          todos.remove(Todo(title: todo.title, editing: this.editing,));
       },
       child: Material(
         color: Colors.transparent,
         child: Padding(
-          padding: EdgeInsets.all(6.0),
+          padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 3.0),
           child: FadeTransition(
             opacity: animation,
             child: Card(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(40.0),
+                borderRadius: BorderRadius.circular(80.0),
               ),
               color: Colors.white,
               elevation: 6.0,
@@ -154,18 +148,40 @@ class TodoState extends State<Todo> with TickerProviderStateMixin {
                 highlightColor: Colors.transparent,
                 borderRadius: _borderRadius,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-                  child: TextField(
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 20.0,
-                    ),
-                    enabled: isEditing ? true : false,
-                    controller: _textEditingController,
-                    onSubmitted: _handleSubmitted,
-                    decoration: InputDecoration.collapsed(
-                        hintText: "Write your task here..."
-                    ),
+                  padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                  child: Row(
+                    children: <Widget>[
+                      Flexible(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          child: TextField(
+                            style: TextStyle(
+                              color: readyButtonPressed ? Colors.grey[500] : Colors.black,
+                              decoration: readyButtonPressed ? TextDecoration.lineThrough : null,
+                              fontSize: 20.0,
+                            ),
+                            enabled: editing ? true : false,
+                            controller: _textEditingController,
+                            maxLengthEnforced: false,
+                            onSubmitted: _handleSubmitted,
+                            decoration: InputDecoration.collapsed(
+                                hintText: "Write your task here..."
+                            ),
+                          ),
+                        ),
+                      ),
+                      Card(
+                        color: readyButtonPressed ? Colors.green[400] : Colors.grey,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
+                        child: IconButton(
+                          iconSize: 25.0,
+                          icon: Icon(Icons.done, color: Colors.white),
+                          onPressed: this.editing == true ? null : _readyButtonPressed,
+                        ),
+                      )
+                    ],
                   ),
                   ),
                 ),
@@ -175,9 +191,19 @@ class TodoState extends State<Todo> with TickerProviderStateMixin {
         ),
       );
   }
+
+  void _readyButtonPressed() {
+    setState(() {
+      print(todos);
+      this.readyButtonPressed = true;
+    });
+  }
+
   void _handleSubmitted(String text) {
     setState(() {
-      isEditing = text.length == 0 ? true : false;
+      this.editing = text.length == 0 ? true : false;
+      todo.title = text;
+      todo.editing = this.editing;
     });
   }
 }
