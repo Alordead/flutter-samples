@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'animated_add_button.dart';
+
 final ThemeData kDefaultTheme = ThemeData(
   primarySwatch: Colors.blue,
   accentColor: Colors.blueAccent,
@@ -28,7 +30,7 @@ class ButtonAnimationsScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            
+            AnimatedAddButton(),
           ],
         ),
       ),
