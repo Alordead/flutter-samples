@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'animated_add_button.dart';
 import 'animated_floating_action_button.dart';
-import 'animated_floating_add_button.dart';
 
 final ThemeData kDefaultTheme = ThemeData(
   primarySwatch: Colors.blue,

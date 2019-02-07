@@ -1,76 +1,61 @@
 import 'package:flutter/material.dart';
 
-class AnimatedAddButton extends StatefulWidget {
-
-  final Color buttonColor = Colors.lightBlue;
-
+class AnimatedFloatingActionButton extends StatefulWidget {
   @override
-  AnimatedAddButtonState createState() {
-    return AnimatedAddButtonState();
-  }
+  _AnimatedFloatingActionButtonState createState() => _AnimatedFloatingActionButtonState();
 }
 
-class AnimatedAddButtonState extends State<AnimatedAddButton> {
+class _AnimatedFloatingActionButtonState extends State<AnimatedFloatingActionButton>
+    with SingleTickerProviderStateMixin {
 
-  var _isTapped = false;
-  var _opacity = 0.0;
-  var _width = 50.0;
+  bool isOpened = false;
+  AnimationController _animationController;
+  Animation<Color> _animateColor;
+  Animation<double> _animateIcon;
+  Curve _curve = Curves.easeOut;
 
-  final _opacitymSec = 200;
-  final IconData _buttonIcon = Icons.group_add;
-  final String _buttonTitle = "Added";
+  @override
+  void initState() {
+    _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 300))
+    ..addListener(() {
+      setState(() {});
+    });
+    _animateIcon = Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+    _animateColor = ColorTween(
+      begin: Colors.lightBlue,
+      end: Colors.redAccent,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Interval(0.00, 1.00, curve: _curve),
+    ));
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  animate() {
+    if (!isOpened) {
+      _animationController.forward();
+    } else {
+      _animationController.reverse();
+    }
+    isOpened = !isOpened;
+  }
+
+    Widget toggle() {
+      return FloatingActionButton(
+        backgroundColor: _animateColor.value,
+        onPressed: animate,
+        tooltip: 'Toggle',
+        child: AnimatedIcon(icon: AnimatedIcons.menu_close, progress: _animateIcon
+        ),
+      );
+    }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _isTapped = !_isTapped;
-          _opacity = _isTapped ? 1.0 : 0.0;
-          _width = _isTapped ? 100.0 : 50.0;
-        });
-      },
-      child: Padding(
-        padding: EdgeInsets.all(5.0),
-        child: AnimatedContainer(
-          duration: Duration(milliseconds: _opacitymSec),
-          alignment: Alignment.center,
-          curve: Curves.linear,
-          height: 50.0,
-          width: _width,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(50.0),
-            border: Border.all(color: (_isTapped ? widget.buttonColor : Colors.transparent), width: 3.0),
-            color: _isTapped ? Colors.transparent : Colors.lightBlue ,
-          ),
-          child: Stack(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.center,
-                child: AnimatedOpacity(
-                  duration: Duration(milliseconds: _opacitymSec),
-                  opacity: _opacity == 0.0 ? 1.0 : 0.0,
-                  child: Icon(
-                    _buttonIcon,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.center,
-                child: AnimatedOpacity(
-                  duration: Duration(milliseconds: _opacitymSec),
-                  opacity: _opacity,
-                  child: Text(
-                    _buttonTitle,
-                    style: TextStyle(color: Colors.lightBlue, fontSize: 20.0),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    return toggle();
   }
 }
