@@ -8,11 +8,11 @@ final kDefaultTheme = ThemeData(
   accentColor: Colors.blueAccent,
   scaffoldBackgroundColor: Colors.grey[100],
   primaryTextTheme: TextTheme(
-      title: TextStyle(
-        color: Colors.black,
-        fontFamily: 'Gotham',
-        fontSize: 26.0,
-      ),
+    title: TextStyle(
+      color: Colors.black,
+      fontFamily: 'Gotham',
+      fontSize: 26.0,
+    ),
   ),
 );
 

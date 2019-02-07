@@ -9,7 +9,8 @@ class Todo extends StatefulWidget {
   bool editing;
   int index;
 
-  Todo({this.title, this.editing, this.index});
+  Todo({Todo todo}) : this.title = todo.title, this.editing = todo.editing, this.index = todo.index;
+  Todo.create({this.title, this.editing, @required this.index});
 
   @override
   State<StatefulWidget> createState() {
@@ -42,21 +43,13 @@ class TodoState extends State<Todo> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      direction: DismissDirection.endToStart,
-      key: Key(todo.title),
-      onDismissed: (direction) {
-        todos.removeAt(todo.index);
-        count -= 1;
-      },
-      child: Material(
-        color: Colors.transparent,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 3.0),
-          child: FadeTransition(
-            opacity: animation,
-            child: todoCard(),
-          ),
+    return Material(
+      color: Colors.transparent,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 3.0),
+        child: FadeTransition(
+          opacity: animation,
+          child: todoCard(),
         ),
       ),
     );
@@ -126,7 +119,6 @@ class TodoState extends State<Todo> with TickerProviderStateMixin {
 
   void _readyButtonPressed() {
     setState(() {
-      print(todos);
       this.readyButtonPressed = true;
     });
   }

@@ -10,10 +10,10 @@ class ToDoListScreen extends StatefulWidget {
   State createState() => ToDoListScreenState();
 }
 
-List<Todo> todos = <Todo>[];
+List<Todo> todos = List<Todo>();
 int count = 0;
 
-class ToDoListScreenState extends State<ToDoListScreen>{
+class ToDoListScreenState extends State<ToDoListScreen> {
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,20 @@ class ToDoListScreenState extends State<ToDoListScreen>{
             padding: EdgeInsets.all(20.0),
             child: ListView.builder(
               itemCount: todos.length,
-              itemBuilder: (context, index) => todos[index],
+              itemBuilder: (context, index) {
+                final todo = todos[index];
+                return Dismissible(
+                  direction: DismissDirection.endToStart,
+                  key: ObjectKey(todo),
+                  onDismissed: (direction) {
+                    setState(() {
+                      todos.removeAt(index);
+                      count -= 1;
+                    });
+                  },
+                  child: Todo(todo: todo),
+                );
+              },
             ),
           ),
         ),
@@ -54,7 +67,7 @@ class ToDoListScreenState extends State<ToDoListScreen>{
         child: Icon(Icons.add, size: 35.0,),
         onPressed: () {
           setState(() {
-            Todo todo = Todo(index: count);
+            Todo todo = Todo.create(index: count);
             todos.add(todo);
             count += 1;
           });
@@ -62,5 +75,4 @@ class ToDoListScreenState extends State<ToDoListScreen>{
       ),
     );
   }
-
 }
