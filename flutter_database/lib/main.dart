@@ -15,7 +15,7 @@ class DBSampleApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Database Sample',
       theme: kDefaultThemeData,
-      home: HomePage(),
+      home: HomePage(title: "Flutter Database Sample",),
     );
   }
 }
