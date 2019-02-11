@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'database.dart';
+import 'kana_model.dart';
 
 final ThemeData kDefaultThemeData = ThemeData(
   primaryColor: Colors.redAccent,
@@ -37,8 +39,25 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Text("Hello flutter!"),
+      body: FutureBuilder<List<Kana>>(
+        future: DBProvider.db.getAllSigns(),
+        builder: (BuildContext context, AsyncSnapshot<List<Kana>> snapshot) {
+          if (snapshot.hasData) {
+            return ListView.builder(
+              itemCount: snapshot.data.length,
+               itemBuilder: (BuildContext context, int index) {
+                Kana item = snapshot.data[index];
+                return ListTile(
+                  title: Text(item.kana),
+                  subtitle: Text(item.reading),
+                  leading: Text(item.id.toString()),
+                  );
+              },
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
       ),
     );
   }
