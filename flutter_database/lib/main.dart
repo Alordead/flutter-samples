@@ -3,9 +3,9 @@ import 'database.dart';
 import 'kana_model.dart';
 
 final ThemeData kDefaultThemeData = ThemeData(
-  primaryColor: Colors.redAccent,
-  primarySwatch: Colors.red,
-  primaryColorBrightness: Brightness.dark,
+  primaryColor: Colors.blueGrey,
+  primarySwatch: Colors.grey,
+  brightness: Brightness.dark,
 );
 
 void main() => runApp(DBSampleApp());
@@ -43,16 +43,21 @@ class _HomePageState extends State<HomePage> {
         future: DBProvider.db.getAllSigns(),
         builder: (BuildContext context, AsyncSnapshot<List<Kana>> snapshot) {
           if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data.length,
-               itemBuilder: (BuildContext context, int index) {
-                Kana item = snapshot.data[index];
-                return ListTile(
-                  title: Text(item.kana),
-                  subtitle: Text(item.reading),
-                  leading: Text(item.id.toString()),
-                  );
+            return GridView.builder(
+              itemBuilder: (context, position) {
+                return Card(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(snapshot.data[position].kana, style: TextStyle(fontSize: 32.0),),
+                      Text(snapshot.data[position].reading),
+                    ],
+                  ),
+                );
               },
+              itemCount: snapshot.data.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
             );
           } else {
             return Center(child: CircularProgressIndicator());
